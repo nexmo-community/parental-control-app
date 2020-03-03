@@ -1,0 +1,12 @@
+<resources>
+    <string name="app_name">npc</string>
+    <string name="proxy_phone_number">MY_PROXY_PHONE_NUMBER</string>
+    <string name="register">REGISTER</string>
+    <string name="enable_role">ENABLE REDIRECTION</string>
+    <string name="enable_proxy">PROXY ENABLED</string>
+    <string name="disable_proxy">PROXY DISABLED</string>
+    <string name="sp_name">SP_NAME_XXXX_XXXX</string>
+    <string name="my_phone_number">My Phone Number</string>
+    <string name="unregister">unregister</string>
+    <string name="server_address">http://MY_WEB_HOOK_SERVER_ADDRESS</string>
+</resources>
