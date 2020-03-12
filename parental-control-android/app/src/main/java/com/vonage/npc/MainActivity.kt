@@ -1,12 +1,11 @@
 package com.vonage.npc
 
-import android.annotation.SuppressLint
 import android.app.role.RoleManager
-import android.content.Context
 import android.content.Intent
 import android.os.Build
 import android.os.Bundle
 import android.util.Log
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import com.vonage.npc.databinding.ActivityMainBinding
@@ -65,24 +64,35 @@ class MainActivity : AppCompatActivity() {
         return isRoleHeldByApp(RoleManager.ROLE_CALL_REDIRECTION)
     }
 
-    @SuppressLint("WrongConstant")
     private fun isRoleHeldByApp(roleName: String): Boolean {
         var roleManager: RoleManager?
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-            roleManager = getSystemService(Context.ROLE_SERVICE) as RoleManager
+            roleManager = getSystemService(RoleManager::class.java)
             return roleManager.isRoleHeld(roleName)
         }
         return false
     }
 
-    @SuppressLint("WrongConstant")
     private fun roleAcquire(roleName: String) {
         var roleManager: RoleManager?
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-            roleManager = getSystemService(Context.ROLE_SERVICE) as RoleManager
-            val intent =
-                roleManager.createRequestRoleIntent(roleName)
-            startActivityForResult(intent, 1)
+            if (roleAvailable(roleName)) {
+                roleManager = getSystemService(RoleManager::class.java)
+                val intent =
+                    roleManager.createRequestRoleIntent(roleName)
+                startActivityForResult(intent, 1)
+            }else{
+                Toast.makeText(this, "Redirection call with role in not available", Toast.LENGTH_SHORT).show()
+            }
         }
+    }
+
+    private fun roleAvailable(roleName: String):Boolean{
+        var roleManager: RoleManager?
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            roleManager = getSystemService(RoleManager::class.java)
+            return roleManager.isRoleAvailable(roleName)
+        }
+        return false
     }
 }
