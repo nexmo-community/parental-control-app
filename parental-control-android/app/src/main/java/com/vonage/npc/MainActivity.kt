@@ -23,81 +23,48 @@ class MainActivity : AppCompatActivity() {
 
     override fun onStart() {
         super.onStart()
-        updateServerProperties()
         updateUI()
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-        Log.d("MainActivity", "onActivityResult requestCode: $requestCode resultCode:$resultCode data:$data")
+        Log.d(
+            "MainActivity",
+            "onActivityResult requestCode: $requestCode resultCode:$resultCode data:$data"
+        )
         updateUI()
     }
 
-    private fun updateServerProperties(){
-        if (getOwnerPhoneNumber(this) != null){
-            setOwnerPhoneNumberServer(getOwnerPhoneNumber(this)!!, this)
-            setPhoneNumberProxy(applicationContext.getString(R.string.proxy_phone_number), applicationContext)
-        }
-    }
+    fun updateUI() {
 
-    @SuppressLint("WrongConstant")
-    fun updateUI(){
         binding.stateCallProxy.isEnabled = false
-        binding.phoneNumberApply.isEnabled = false
         binding.enableRoleCallProxy.isEnabled = false
-        binding.unregister.isEnabled = false
-        if (!isRegister()){
-            binding.phoneNumberApply.isEnabled = true
-            binding.phoneNumberInput.setText(getOwnerPhoneNumber(this))
-            binding.phoneNumberApply.setOnClickListener {
-                if(binding.phoneNumberInput.text!!.isNotEmpty()){
-                    setOwnerPhoneNumber(binding.phoneNumberInput.text.toString(), this)
-                    setPhoneNumberProxy(applicationContext.getString(R.string.proxy_phone_number), applicationContext)
-                    updateUI()
-                }
-            }
-            return
-        }
-
-
-        binding.unregister.isEnabled = true
-        binding.unregister.setOnClickListener {
-            setOwnerPhoneNumber("", this)
-            setState(false, this)
-            updateUI()
-        }
 
         binding.phoneNumberInput.setText(getOwnerPhoneNumber(this))
-        if (!isRedirection()){
+        if (!isRedirection()) {
             binding.enableRoleCallProxy.isEnabled = true
             binding.enableRoleCallProxy.setOnClickListener {
+                setOwnerPhoneNumber(binding.phoneNumberInput.text.toString(), this)
                 roleAcquire(RoleManager.ROLE_CALL_REDIRECTION)
+                setRedirectState(true, this)
                 updateUI()
             }
             return
         }
 
         binding.stateCallProxy.isEnabled = true
-        binding.stateCallProxy.isChecked = getState(this)
+        binding.stateCallProxy.isChecked = getRedirectState(this)
         binding.stateCallProxy.setOnClickListener {
-            setState(binding.stateCallProxy.isChecked, this)
+            setRedirectState(binding.stateCallProxy.isChecked, this)
             updateUI()
         }
-
-
     }
 
-    //is our app register a phone number
-    private fun isRegister(): Boolean {
-        return !getOwnerPhoneNumber(this).isNullOrEmpty()
-    }
-
-    //is our app register as the call redirection service
+    // Is our app registered as the call redirection service
     private fun isRedirection(): Boolean {
         return isRoleHeldByApp(RoleManager.ROLE_CALL_REDIRECTION)
     }
 
-    //is our app register as the call redirection service
     @SuppressLint("WrongConstant")
     private fun isRoleHeldByApp(roleName: String): Boolean {
         var roleManager: RoleManager?
@@ -118,6 +85,4 @@ class MainActivity : AppCompatActivity() {
             startActivityForResult(intent, 1)
         }
     }
-
-
 }

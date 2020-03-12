@@ -10,7 +10,7 @@ const Router = function(proxies) {
     const to = req.body.to; 
     
     const json = { 
-      number: process.env.VONAGE_PROXY_NUMBER
+      number: process.env.VONAGE_PROXY_NUMBER_LOCAL
     }; 
 
     proxies.setProxy(from, to); 

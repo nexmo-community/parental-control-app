@@ -7,23 +7,31 @@ import android.util.Log
 
 class CallRedirectionServiceImplementation : CallRedirectionService() {
 
-    override fun onPlaceCall(handle: Uri, initialPhoneAccount: PhoneAccountHandle, allowInteractiveResponse: Boolean) {
-        Log.d("CallRedirectionServiceImplementation", " handle:$handle , initialPhoneAccount:$initialPhoneAccount , allowInteractiveResponse:$allowInteractiveResponse")
+    override fun onPlaceCall(
+        handle: Uri,
+        initialPhoneAccount: PhoneAccountHandle,
+        allowInteractiveResponse: Boolean
+    ) {
+        Log.d(
+            "CallRedirectionServiceImplementation",
+            " handle:$handle , initialPhoneAccount:$initialPhoneAccount , allowInteractiveResponse:$allowInteractiveResponse"
+        )
 
         //Check if the service should redirect the call
-        if (getState(applicationContext)) {
+        if (getRedirectState(applicationContext)) {
             //Update the web hook the current call destination
-            setPhoneCallServer(handle.encodedSchemeSpecificPart, applicationContext)
-            setPhoneNumberProxy(applicationContext.getString(R.string.proxy_phone_number), applicationContext)
-            //Change the outgoing call to Nexmo number
-            val newPhone = Uri.fromParts("tel", getProxyPhoneNumber(applicationContext), "")
-            Log.d("CallRedirectionServiceImplementation", " newPhone:$newPhone")
-            //Redirect the call without any user interaction
-            redirectCall(newPhone, initialPhoneAccount, false)
-        }else{
+            setPhoneNumberProxy(
+                handle.encodedSchemeSpecificPart,
+                applicationContext,
+                initialPhoneAccount,
+                this
+            )
+        } else {
             placeCallUnmodified()
         }
     }
 
-
+    fun redirectToVonage(newPhone: Uri, initialPhoneAccount: PhoneAccountHandle) {
+        redirectCall(newPhone, initialPhoneAccount, false)
+    }
 }

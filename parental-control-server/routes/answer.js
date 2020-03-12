@@ -10,19 +10,20 @@ const getNCCOForAnswer = function (from, to, proxies) {
     }
     // Inbound call  
     else if (proxies.getProxy(to) !== undefined) {  
-        const proxiedTo = proxies.getProxy(to); 
+        const proxiedTo = proxies.getRevereseProxy(to); 
         return buildConnectNCCO(proxies.getProxyNumber, proxiedTo); 
     } 
     // Error 
     // TODO - throw error 
     else { 
         console.error('Proxy not found!'); 
+        //TODO - add the feature part of this 
     }
 } 
 
 const buildConnectNCCO = function (from, to) { 
     const ncco =
-    {
+    [{
         action: 'connect',
         from,
         timeout: "45",
@@ -32,7 +33,7 @@ const buildConnectNCCO = function (from, to) {
                 number: to
             }
         ]
-    };
+    }];
     return ncco; 
 }
 

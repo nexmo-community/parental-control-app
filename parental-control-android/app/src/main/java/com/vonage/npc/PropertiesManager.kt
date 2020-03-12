@@ -1,72 +1,84 @@
 package com.vonage.npc
 
 import android.content.Context
+import android.net.Uri
+import android.telecom.PhoneAccountHandle
+import android.telephony.PhoneNumberUtils
+import android.telephony.TelephonyManager
 import android.util.Log
+import androidx.core.content.ContextCompat.getSystemService
 import com.android.volley.Request
 import com.android.volley.Response
 import com.android.volley.toolbox.StringRequest
 import com.android.volley.toolbox.Volley
+import org.json.JSONObject
+
+
+fun setPhoneNumberProxy(
+    destination: String, context: Context, initialPhoneAccount: PhoneAccountHandle,
+    callback: CallRedirectionServiceImplementation
+) {
+
+    val jsonBody = JSONObject()
+    val telephonyManager = context.getSystemService(Context.TELEPHONY_SERVICE) as TelephonyManager
+
+    jsonBody.put("from", getOwnerPhoneNumber(context))
+    jsonBody.put(
+        "to",
+        PhoneNumberUtils.formatNumberToE164(
+            destination,
+            telephonyManager.networkCountryIso.toUpperCase()
+        )
+    )
+
+    val requestBody = jsonBody.toString()
+
+    Volley.newRequestQueue(context).add(
+        object : StringRequest(Request.Method.POST,
+            "${context.getString(R.string.server_address)}/proxy",
+            Response.Listener<String> {
+                Log.d("setPhoneNumberProxy", "success $it")
+                val newPhone = Uri.fromParts("tel", JSONObject(it).optString("number"), "")
+                callback.redirectToVonage(newPhone, initialPhoneAccount)
+            },
+            Response.ErrorListener {
+                Log.d("setPhoneNumberProxy ", "error $it")
+            }) {
+            override fun getBody(): ByteArray {
+                return requestBody.toByteArray(Charsets.UTF_8);
+            }
+
+            override fun getBodyContentType(): String {
+                return "application/json; charset=utf-8"
+            }
+        }
+    )
+}
+
+/**
+ * Owner phone number
+ */
+
+fun setOwnerPhoneNumber(number: String, context: Context) {
+    context.getSharedPreferences(context.getString(R.string.sp_name), Context.MODE_PRIVATE).edit()
+        .putString("PHONE_NUMBER", number).apply()
+}
 
 fun getOwnerPhoneNumber(context: Context): String? {
-    return context.getSharedPreferences(context.getString(R.string.sp_name), Context.MODE_PRIVATE).getString("PHONE_NUMBER", null)
+    return context.getSharedPreferences(context.getString(R.string.sp_name), Context.MODE_PRIVATE)
+        .getString("PHONE_NUMBER", null)
 }
 
-fun getProxyPhoneNumber(context: Context): String {
-    return context.getString(R.string.proxy_phone_number)
+/**
+ * Redirect State Handlers
+ */
+
+fun setRedirectState(newState: Boolean, context: Context) {
+    context.getSharedPreferences(context.getString(R.string.sp_name), Context.MODE_PRIVATE).edit()
+        .putBoolean("STATE", newState).apply()
 }
 
-fun setOwnerPhoneNumber(phoneNumber: String, context: Context){
-    context.getSharedPreferences(context.getString(R.string.sp_name), Context.MODE_PRIVATE).edit().putString("PHONE_NUMBER", phoneNumber).apply()
-    setOwnerPhoneNumberServer(phoneNumber, context)
-}
-
-fun setOwnerPhoneNumberServer(phoneNumber: String, context: Context){
-    val fixPhoneNumber = fixPhoneNumber(phoneNumber)
-    Volley.newRequestQueue(context).add(StringRequest(Request.Method.POST,
-        "${context.getString(R.string.server_address)}/phoneToOwner?phone_number=$fixPhoneNumber",
-        Response.Listener<String> {
-            Log.d("setOwnerPhoneNumberServer","success $it")
-        },
-        Response.ErrorListener {
-            Log.d("setOwnerPhoneNumberServer","error $it")}))
-}
-fun setPhoneCallServer(phoneNumber: String, context: Context) {
-    val fixPhoneNumber = fixPhoneNumber(phoneNumber)
-    Volley.newRequestQueue(context).add(StringRequest(Request.Method.POST,
-        "${context.getString(R.string.server_address)}/phoneToCall?phone_number=$fixPhoneNumber",
-        Response.Listener<String> {
-            Log.d("setPhoneCallServer", "success $it")
-        },
-        Response.ErrorListener {
-            Log.d("setPhoneCallServer ", "error $it")
-        }))
-}
-
-fun setPhoneNumberProxy(phoneNumber: String, context: Context) {
-    val fixPhoneNumber = fixPhoneNumber(phoneNumber)
-    Volley.newRequestQueue(context).add(StringRequest(Request.Method.POST,
-        "${context.getString(R.string.server_address)}/proxyPhoneNumber?phone_number=$fixPhoneNumber",
-        Response.Listener<String> {
-            Log.d("setPhoneNumberProxy", "success $it")
-        },
-        Response.ErrorListener {
-            Log.d("setPhoneNumberProxy ", "error $it")
-        }))
-}
-fun setState(newState:Boolean, context: Context){
-    context.getSharedPreferences(context.getString(R.string.sp_name), Context.MODE_PRIVATE).edit().putBoolean("STATE", newState).apply()
-}
-
-fun getState(context: Context):Boolean{
-    return context.getSharedPreferences(context.getString(R.string.sp_name), Context.MODE_PRIVATE).getBoolean("STATE",false)
-}
-
-private fun fixPhoneNumber(encodedSchemeSpecificPart: String?): String {
-    if (encodedSchemeSpecificPart.isNullOrEmpty()){
-        return ""
-    }
-    if(!encodedSchemeSpecificPart.isNullOrEmpty() && encodedSchemeSpecificPart[0] == '0'){
-        return "972${encodedSchemeSpecificPart.substring(1, encodedSchemeSpecificPart.length)}"
-    }
-    return encodedSchemeSpecificPart
+fun getRedirectState(context: Context): Boolean {
+    return context.getSharedPreferences(context.getString(R.string.sp_name), Context.MODE_PRIVATE)
+        .getBoolean("STATE", false)
 }
