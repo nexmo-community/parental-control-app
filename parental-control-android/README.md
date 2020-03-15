@@ -1,4 +1,4 @@
-# parental-control-app
+# parental-control-android
 
 Sample code for building an android parental control application
 
