@@ -2,12 +2,12 @@
 
 Sample code for building a voice parental control application
 
-## Server
+This repository has two parts - a server (voice webhook) and an Android application, you will need to setup both projects:
 
-The server is a simple Express based server, to run it all you need to do is
+1. [Server](./parental-control-server/README.md)
+2. [Application](./parental-control-app/README.md)
 
-`npm install && npm run start`
+After setting both components, and after the required setup in the Vonage dashboard, you will be able to-
 
-Before running you'll need to copy example.env to .env and fill in the required paramters:
-
-1. VONAGE_PROXY_NUMBER: The Vonage number you've purchased and linked to your application. Can be found on the [dashboard](https://dashboard.nexmo.com/applications/) under the application you're using.
+1. Redirect calls from Android through Vonage, and by that masking your phone
+2. Enjoy the verity of features Vonage's Voice API offers on your calls
