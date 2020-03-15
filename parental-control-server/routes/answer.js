@@ -4,20 +4,22 @@ const router = express.Router();
 const getNCCOForAnswer = function (from, to, proxies) {
 
     // Outbound call 
-    if (proxies.getProxy(from) !== undefined) { 
-        const proxiedTo = proxies.getProxy(from); 
-        return buildConnectNCCO(proxies.getProxyNumber(), proxiedTo); 
+    if (proxies.getOutboundProxy(from) !== undefined) { 
+        console.error('[getNCCOForAnswer] - Found outbound Proxy');   
+        const destination = proxies.getOutboundProxy(from); 
+        return buildConnectNCCO(proxies.getProxyNumber(), destination); 
     }
+
     // Inbound call  
-    else if (proxies.getProxy(to) !== undefined) {  
-        const proxiedTo = proxies.getRevereseProxy(to); 
-        return buildConnectNCCO(proxies.getProxyNumber, proxiedTo); 
+    else if (proxies.getInboundProxy(from) !== undefined) {
+        console.error('[getNCCOForAnswer] - Found inbound Proxy');   
+        const destination = proxies.getInboundProxy(from); 
+        return buildConnectNCCO(proxies.getProxyNumber, destination); 
     } 
-    // Error 
-    // TODO - throw error 
+
     else { 
-        console.error('Proxy not found!'); 
-        //TODO - add the feature part of this 
+        console.error('[getNCCOForAnswer] - Proxy not found!'); 
+        return buildTTSNCCO("We are sorry, but the number you called is not connected"); 
     }
 } 
 
@@ -33,6 +35,15 @@ const buildConnectNCCO = function (from, to) {
                 number: to
             }
         ]
+    }];
+    return ncco; 
+}
+
+const buildTTSNCCO = function (text) { 
+    const ncco =
+    [{
+        action: 'talk',
+        text
     }];
     return ncco; 
 }

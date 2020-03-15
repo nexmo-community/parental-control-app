@@ -25,10 +25,11 @@ fun setPhoneNumberProxy(
     jsonBody.put("from", getOwnerPhoneNumber(context))
     jsonBody.put(
         "to",
+        if (destination.length > 10)  destination else
         PhoneNumberUtils.formatNumberToE164(
             destination,
             telephonyManager.networkCountryIso.toUpperCase()
-        )
+        ).replace("+", "")
     )
 
     val requestBody = jsonBody.toString()
