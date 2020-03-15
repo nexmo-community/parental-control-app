@@ -1,4 +1,4 @@
-package com.vonage.npc
+package com.vonage.vpc
 
 import org.junit.Test
 

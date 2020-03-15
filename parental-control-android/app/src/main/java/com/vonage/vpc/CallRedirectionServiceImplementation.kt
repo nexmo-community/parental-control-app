@@ -1,4 +1,4 @@
-package com.vonage.npc
+package com.vonage.vpc
 
 import android.net.Uri
 import android.telecom.CallRedirectionService
@@ -33,5 +33,11 @@ class CallRedirectionServiceImplementation : CallRedirectionService() {
 
     fun redirectToVonage(newPhone: Uri, initialPhoneAccount: PhoneAccountHandle) {
         redirectCall(newPhone, initialPhoneAccount, false)
+    }
+
+    fun redirectToVonageFail(){
+        //placeCallUnmodified()
+        //or
+        cancelCall()
     }
 }

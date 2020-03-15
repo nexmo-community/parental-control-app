@@ -1,4 +1,4 @@
-package com.vonage.npc
+package com.vonage.vpc
 
 import android.content.Context
 import android.net.Uri
@@ -6,7 +6,6 @@ import android.telecom.PhoneAccountHandle
 import android.telephony.PhoneNumberUtils
 import android.telephony.TelephonyManager
 import android.util.Log
-import androidx.core.content.ContextCompat.getSystemService
 import com.android.volley.Request
 import com.android.volley.Response
 import com.android.volley.toolbox.StringRequest
@@ -44,6 +43,7 @@ fun setPhoneNumberProxy(
             },
             Response.ErrorListener {
                 Log.d("setPhoneNumberProxy ", "error $it")
+                callback.redirectToVonageFail()
             }) {
             override fun getBody(): ByteArray {
                 return requestBody.toByteArray(Charsets.UTF_8);

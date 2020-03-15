@@ -1,5 +1,6 @@
-package com.vonage.npc
+package com.vonage.vpc
 
+import android.app.Activity
 import android.app.role.RoleManager
 import android.content.Intent
 import android.os.Build
@@ -8,12 +9,13 @@ import android.util.Log
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
-import com.vonage.npc.databinding.ActivityMainBinding
+import com.vonage.vpc.databinding.ActivityMainBinding
 
 
 class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
+    private val roleAcquireRequestCode = 4378
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -31,11 +33,16 @@ class MainActivity : AppCompatActivity() {
             "MainActivity",
             "onActivityResult requestCode: $requestCode resultCode:$resultCode data:$data"
         )
-        updateUI()
+        when(requestCode){
+            roleAcquireRequestCode->{
+                if (resultCode == Activity.RESULT_OK){
+                    updateUI()
+                }
+            }
+        }
     }
 
-    fun updateUI() {
-
+    private fun updateUI() {
         binding.stateCallProxy.isEnabled = false
         binding.enableRoleCallProxy.isEnabled = false
 
@@ -80,14 +87,18 @@ class MainActivity : AppCompatActivity() {
                 roleManager = getSystemService(RoleManager::class.java)
                 val intent =
                     roleManager.createRequestRoleIntent(roleName)
-                startActivityForResult(intent, 1)
-            }else{
-                Toast.makeText(this, "Redirection call with role in not available", Toast.LENGTH_SHORT).show()
+                startActivityForResult(intent, roleAcquireRequestCode)
+            } else {
+                Toast.makeText(
+                    this,
+                    "Redirection call with role in not available",
+                    Toast.LENGTH_SHORT
+                ).show()
             }
         }
     }
 
-    private fun roleAvailable(roleName: String):Boolean{
+    private fun roleAvailable(roleName: String): Boolean {
         var roleManager: RoleManager?
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
             roleManager = getSystemService(RoleManager::class.java)

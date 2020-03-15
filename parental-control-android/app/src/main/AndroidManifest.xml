@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.vonage.npc">
+    package="com.vonage.vpc">
 
     <uses-permission android:name="android.permission.INTERNET" />
     <application
@@ -11,17 +11,16 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".MainActivity">
+        <activity android:name="com.vonage.vpc.MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <action android:name="android.intent.action.VIEW" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
-                <category android:name="android.intent.category.APP_MESSAGING" />
             </intent-filter>
         </activity>
         <service
-            android:name=".CallRedirectionServiceImplementation"
+            android:name="com.vonage.vpc.CallRedirectionServiceImplementation"
             android:permission="android.permission.BIND_CALL_REDIRECTION_SERVICE">
             <intent-filter>
                 <action android:name="android.telecom.CallRedirectionService" />

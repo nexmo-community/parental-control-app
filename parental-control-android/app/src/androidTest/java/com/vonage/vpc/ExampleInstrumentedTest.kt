@@ -1,4 +1,4 @@
-package com.vonage.npc
+package com.vonage.vpc
 
 import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.ext.junit.runners.AndroidJUnit4
