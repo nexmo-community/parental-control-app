@@ -7,7 +7,7 @@
     "debug": "node --inspect ./bin/www"
   },
   "dependencies": {
-    "cookie-parser": "~1.4.3",
+    "cookie-parser": "~1.4.7",
     "debug": "~2.6.9",
     "dotenv": "^8.2.0",
     "express": "~4.16.0",
